@@ -4,7 +4,7 @@ object AdvancedPatternMatching extends App {
 
   val numbers = List(1)
 
-  val description = numbers match {
+  val description: Unit = numbers match {
     case head::Nil => println(s"the only element is $head")
     case _ =>
   }
@@ -49,4 +49,61 @@ object AdvancedPatternMatching extends App {
   }
 
   println(mathProperty)
+
+  //infix patterns
+  case class Or[A,B](a: A, b: B)
+  val either = Or(2, "two")
+  val humanDescription = either match {
+    case number Or string => s"$number is written as $string"
+  }
+  println(humanDescription)
+
+  // decomposing sequences
+  val varargs = numbers match {
+    case List(1, _*) => "starting with 1"
+  }
+
+  trait  MyList[+A]{
+    def head: A = ???
+    def tail: MyList[A] = ???
+  }
+
+  case object Empty extends  MyList[Nothing]
+  case class Cons[+A](override val head: A, override val tail: MyList[A]) extends MyList[A]
+
+  object  MyList {
+    def unapplySeq[A] (list: MyList[A]): Option[Seq[A]] = {
+      if(list == Empty) Some(Seq.empty)
+      else unapplySeq(list.tail).map(list.head +: _)
+    }
+  }
+
+  val myList : MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
+
+  val decomposed = myList match {
+    case MyList(1, _*) => "starting with 1, 2 "
+    case _ => "Something else"
+  }
+
+  println(decomposed)
+
+  // custom return types for unapply
+  // isEmpty: Boolean, get: Something
+
+  abstract class Wrapper[T] {
+    def isEmpty: Boolean
+    def get: T
+  }
+
+  object PersonWrapper {
+    def unapply(arg: Person): Wrapper[String] = new Wrapper[String] {
+       def isEmpty: Boolean = false
+       def get: String = arg.name
+    }
+  }
+
+  println(david match {
+    case PersonWrapper(n) => s"This person's name is $n"
+  })
+
 }
