@@ -39,10 +39,10 @@ object ConcurrencyIntro extends App {
 
   // This will blowww it not accept any more requests
   //pool.execute(() => {
-  //println("almost awake!")
+    //println("almost awake!")
   //})
 
-  // pool.shutdownNow() //this kills everything
+ // pool.shutdownNow() //this kills everything
   println(pool.isShutdown)
 
   def runInParallel = {
